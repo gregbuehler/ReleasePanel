@@ -1,0 +1,41 @@
+﻿@using Microsoft.DotNet.ProjectModel
+@using ReleasePanel.Models
+@model dynamic
+    
+@{
+    var project = (GithubProject)ViewData["Project"];
+
+    ViewBag.Title = $"{project.Name}";
+    Layout = "_Layout";
+}
+
+<h2>@project.Name</h2>
+
+<table class="table">
+    <thead>
+    <tr>             
+        <td>Name</td>
+        <td>Type</td>
+        <td>Created</td>
+        <td>Source</td>
+        <td>Build</td>
+        <td>Deploy</td>
+    </tr>
+    </thead>
+    <tbody>
+    @if (project.Releases != null)
+    {
+        foreach (var release in project.Releases.OrderByDescending(r => r.CreatedAt))
+        {
+            <tr>
+                <td><a href="/projects/@project.Name/@release.Id">@release.Title</a></td>
+                <td>@release.ReleaseType</td>
+                <td>@release.CreatedAt</td>                 
+                <td><a href="@release.Link"><i class="fa fa-github" aria-hidden="true"></i></a></td>
+                <td><a href="@release.BuildUrl"><i class="fa fa-cogs" aria-hidden="true"></i></a></td>
+                <td><a href="@release.DeployUrl"><i class="fa fa-cloud-download" aria-hidden="true"></i></a></td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>

@@ -1,0 +1,145 @@
+﻿@using Microsoft.DotNet.ProjectModel
+@using ReleasePanel.Models
+@model dynamic
+
+@{  
+    var project = (GithubProject)ViewData["Project"];
+    var release = (GithubRelease)ViewData["Release"];
+
+    ViewBag.Title = $"{project.Name} - {release.Title}";
+    Layout = "_Layout";
+}
+
+<h2>@project.Name - @release.Title</h2>
+                                  
+<h3>Changes</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <td>Status</td>
+            <td>Title</td>
+        </tr>
+    </thead>
+    <tbody>
+        @if (release.Changes != null)
+        {
+            foreach (var change in release.Changes)
+            {
+                <tr>
+                    <td>@change.State</td>
+                    <td>@change.Title</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+<h3>Participants</h3>
+
+    @if (release.Participants.Length > 0)
+    {
+        <ul>
+            @foreach (var participant in release.Participants)
+            {
+                <li>@participant</li>
+            }
+        </ul>
+    }
+    else
+    {
+        @:No Participants
+    }
+
+<h3>Scope</h3>
+
+    @if (release.Changes != null)
+    {
+        var apps = new List<string>();
+        var tasks = new List<string>();
+        var services = new List<string>();
+
+        foreach (var change in release.Changes)
+        {
+            if (change.Labels != null)
+            {
+                foreach (var label in change.Labels)
+                {
+                    if (label.Contains(": "))
+                    {
+                        var parts = label.Split(':');
+                        var key = parts[0].ToLower().Trim();
+                        var value = parts[1].Trim();
+                        switch (key)
+                        {
+                            case "app":
+                                if (!apps.Contains(value))
+                                {
+                                    apps.Add(value);
+                                }
+                                break;
+                            case "tasks":
+                                if (!tasks.Contains(value))
+                                {
+                                    tasks.Add(value);
+                                }
+                                break;
+                            case "services":
+                                if (!services.Contains(value))
+                                {
+                                    services.Add(value);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        <h4>Applications</h4>
+        <ul>
+            @if (apps.Count > 0)
+            {
+                foreach (var item in apps)
+                {
+                    <li>@item</li>
+                }
+            }
+            else
+            {
+            <li>No applications</li>
+            }
+        </ul>
+
+        <h4>Scheduled Tasks</h4>
+        <ul>
+            @if (tasks.Count > 0)
+            {
+                foreach (var item in tasks)
+                {
+                    <li>@item</li>
+                }
+            }
+            else
+            {
+                <li>No scheduled tasks</li>
+            }
+        </ul>
+
+        <h4>Services</h4>
+        <ul>
+            @if (services.Count > 0)
+            {
+                foreach (var item in services)
+                {
+                    <li>@item</li>
+                }
+            }
+            else
+            {
+                <li>No services</li>
+            }
+        </ul>
+    }

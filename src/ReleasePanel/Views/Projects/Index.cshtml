@@ -1,0 +1,39 @@
+﻿@using Microsoft.DotNet.ProjectModel
+@using ReleasePanel.Models
+@model dynamic
+
+@{
+    var projects = (List<GithubProject>) ViewData["Projects"];
+
+    ViewBag.Title = "Projects";
+    Layout = "_Layout";
+}
+
+<h2>Projects</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <td>Name</td>
+        <td>Last Release</td>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var project in projects)
+        {
+            <tr>
+                <td><a href="/projects/@project.Name">@project.Name</a></td>
+                <td>
+                    @if (project.Releases != null && project.Releases.Count() > 0)
+                    {
+                        @project.Releases.OrderByDescending(p => p.CreatedAt).FirstOrDefault().CreatedAt;
+                    }
+                    else
+                    {
+                        @:No releases yet!
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
